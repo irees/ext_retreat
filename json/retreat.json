@@ -1,0 +1,30 @@
+// Registration parameters
+{"keytype":"paramdef","name":"registration_type","vartype":"string"}
+{"keytype":"paramdef","name":"name_pis_string","vartype":"string", "iter":true}
+{"keytype":"paramdef","name":"registration_pi","vartype":"string"}
+{"keytype":"paramdef","name":"registration_pi_secondary","vartype":"string"}
+{"keytype":"paramdef","name":"registration_presentation","vartype":"string"}
+{"keytype":"paramdef","name":"registration_attend","vartype":"string", "iter":true}
+{"keytype":"paramdef","name":"registration_accomodation","vartype":"string"}
+{"keytype":"paramdef","name":"registration_gender","vartype":"string"}
+{"keytype":"paramdef","name":"registration_roommate","vartype":"string"}
+{"keytype":"paramdef","name":"registration_shirtsize","vartype":"string"}
+{"keytype":"paramdef","name":"registration_funding_source","vartype":"string"}
+{"keytype":"paramdef","name":"registration_mealpreferences","vartype":"string", "iter":true}
+{"keytype":"paramdef","name":"registration_presenter","vartype":"string"}
+{"keytype":"paramdef","name":"registration_abstract_authors","vartype":"string", "iter":true}
+{"keytype":"paramdef","name":"registration_abstract_title","vartype":"string"}
+{"keytype":"paramdef","name":"registration_abstract_text","vartype":"text"}
+
+// Poster #
+{"keytype":"paramdef","name":"registration_poster_number","vartype":"int"}
+
+// Registration rds
+{"keytype":"recorddef","name":"registration","mainview":"Registration"}
+
+// Registration rds
+{"keytype":"recorddef","name":"registration_abstract","mainview":"Registration"}
+
+// Scoring
+{"keytype":"paramdef", "name":"judging_ranked_score", "vartype":"int", "iter":true}
+{"keytype":"recorddef", "name":"judging_result", "mainview":"Judging Results"}
