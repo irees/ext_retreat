@@ -330,7 +330,7 @@ cells = sum(range(len(abstract_d)))
 
     <tr>
         <td><strong>Coverage:</strong>
-        <td>${count} out of ${cells} (${"%5.1f"%(100*count/float(cells))}% )</td>
+        <td>${count} out of ${cells} (${"%5.1f"%(100*count/float(cells or 1))}% )</td>
     </tr>
     
 
@@ -343,11 +343,11 @@ cells = sum(range(len(abstract_d)))
     
     <tr>
         <%
-        _jpp = map(len, judged_by.values())
+        _jpp = map(len, judged_by.values()) or [0]
         %>
         <td><strong>Judges per poster:</strong></td>
         <td>
-             ${min(_jpp)} - ${max(_jpp)} (average: ${"%5.1f"%(sum(_jpp) / float(len(judged_by)))})
+             ${min(_jpp)} - ${max(_jpp)} (average: ${"%5.1f"%(sum(_jpp) / float(len(judged_by) or 1))})
         </td>
     </tr>
     % for v in sorted(set(_jpp)):

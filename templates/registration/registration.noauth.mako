@@ -3,13 +3,13 @@
 <%namespace name="buttons" file="/buttons"  /> 
 <%namespace name="login" file="/auth/login"  /> 
 
-<p>Welcome to the Baylor College of Medicine Biochemistry &amp; Molecular Biology and Department of Pharmacology Research Conference 2012.</p>
+<p>Welcome to the Baylor College of Medicine Biochemistry &amp; Molecular Biology and Department of Pharmacology Research Conference 2013.</p>
 
 <br />
 
 <form action="${ctxt.root}/registration/new/" method="get">
 	<p style="text-align:center">
-		<input type="submit" class="e2l-big" value="Click here to register for the 2012 conference" />
+		<input type="submit" class="e2l-big" value="Click here to register for the 2013 conference" />
 	</p>
 </form>
 

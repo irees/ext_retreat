@@ -15,9 +15,9 @@ You may login to edit your registration and submit an abstract. You must submit 
 
 Maximum poster size is 3'10" wide by 4'8" high.
 
-Please note that changes to your registration must be completed by September 10, 2012.
+Please note that changes to your registration must be completed by September 10, 2013.
 
-Abstracts will be accepted until September 23, 2012. 
+Abstracts will be accepted until September 23, 2013. 
 
 Please contact me if you have any difficulties.
 

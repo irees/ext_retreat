@@ -82,20 +82,19 @@ class Registration(View):
         if not username or username=='anonymous':
             self.template = "/registration/registration.noauth"
             return
+        
+        children = self.db.rel.children(user.record, recurse=-1)
+        children_recs = self.db.record.get(children)
             
         # Get the registration and abstract
-        try:
-            abstracts = self.db.record.get(self.db.rel.children(user.record, rectype='registration_abstract'))
-        except:
-            abstracts = []
+        abstracts = filter(lambda x:x.rectype == 'registration_abstract', children_recs)
         self.ctxt['abstracts'] = abstracts
         
-        try:
-            registrations = self.db.record.get(self.db.rel.children(user.record, rectype='registration'))       
-            registration = registrations[-1]
-        except:
-            registration = {}
-        self.ctxt['registration'] = registration
+        registrations = filter(lambda x:x.rectype == 'registration', children_recs)
+        if registrations:
+            self.ctxt['registration'] = registrations[-1]
+        else:
+            self.ctxt['registration'] = {}
 
     @View.add_matcher(r'^/registration/new/$')
     def register_new(self, **kwargs):
@@ -128,7 +127,7 @@ class Registration(View):
         try:
             user = self.db.newuser.new(email=email, password=password)
             user.setsignupinfo(kwargs)
-            self.db.newuser.put(user)
+            self.db.newuser.request(user)
         except Exception, e:
             self.ctxt['ERRORS'].append('There was an error processing your request: %s'%e)
             return
@@ -175,7 +174,7 @@ class Registration(View):
     
         username = self.db.auth.check.context()[0]
         user = self.db.user.get(username)
-        abstract = self.db.record.new('registration_abstract')
+        abstract = self.db.record.new(rectype='registration_abstract')
         abstract.parents.add(user.record)
         self.ctxt['abstract'] = abstract
 
@@ -339,7 +338,7 @@ class Judging(View):
             self.notify(str(e), error=True)
             
         else:
-            newrec = self.db.record.new('judging_result')
+            newrec = self.db.record.new(rectype='judging_result')
             newrec['judging_ranked_score'] = judging_ranked_score
             rec = self.db.record.put(newrec)
             self.notify('Saved score: %s'%(', '.join(map(str, rec.get('judging_ranked_score', [])))))

@@ -25,7 +25,7 @@ your registration details, and submit an abstract for your talk or poster.</p>
 					<td>Password:</td>
 					<td>
 						<input required="required" name="password" type="password" value="${kwargs.get('password','')}">
-						<span class="e2l-small">Minimum 6 characters</span>
+						<span class="e2l-small">Minimum 8 characters</span>
 					</td>
 				</tr>
 

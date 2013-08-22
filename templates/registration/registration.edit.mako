@@ -55,8 +55,8 @@
 					    <ul class="e2l-nonlist">
 					        <% 
                                 days = collections.OrderedDict()
-                                days['2012-10-11'] = "Thursday, October 11"
-                                days['2012-10-12'] = "Friday, October 12"
+                                days['2013-10-10'] = "Thursday, October 10"
+                                days['2013-10-11'] = "Friday, October 11"
 					        %>
 					        ${forms.checkboxes(prefix+'registration_attend', days, elem='li', values=rec.get('registration_attend'))}
 					    </ul>
@@ -82,7 +82,7 @@
                         <p>
     						All 3rd year and above students are required to present a talk or a poster.
     						2nd year students and postdocs are encouraged to present talks and posters.
-    						You will have until September 23, 2012 to submit and revise abstracts.
+    						You will have until September 23, 2013 to submit and revise abstracts.
                             Maximum poster size is 3'10" wide by 4'8" high.
                         </p>
 					% else:

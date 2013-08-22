@@ -9,7 +9,7 @@
 				<tr>
 					<td>${"".join(map(lambda x:x.capitalize(),abs.get('registration_presentation',[])))} Title:</td>
 					<td class="retreat-smallcaps">
-						${markdown.markdown(abs.get('registration_abstract_title','No Title').replace('\t','').replace('\n','\n\n'), extensions=['superscript','subscript'])}
+						${markdown.markdown(abs.get('registration_abstract_title','No Title').replace('\t','').replace('\n','\n\n'), safe_mode='escape') | n}
 						(<a href="${ctxt.root}/registration/abstract/${abs.get('name')}/edit/">Edit</a>)
 					</td>
 				</tr>
@@ -22,7 +22,7 @@
 				<tr>
 					<td>Abstract:</td>
 					<td>
-						${markdown.markdown(abs.get('registration_abstract_text','').replace('\t','').replace('\n','\n\n'), extensions=['superscript','subscript'])}
+						${markdown.markdown(abs.get('registration_abstract_text','').replace('\t','').replace('\n','\n\n'), safe_mode='escape') | n}
 					</td>
 				</tr>
 

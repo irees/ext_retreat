@@ -80,7 +80,7 @@ for abstract in abstracts_sorted:
 
 % for abstract in abstracts_sorted:
 	<div class="retreat-smallcaps">
-		${markdown.markdown(abstract.get('registration_abstract_title'), extensions=[])}
+		${markdown.markdown(abstract.get('registration_abstract_title'), safe_mode='escape') | n}
 	</div>
 	
 	<p>
@@ -91,7 +91,7 @@ for abstract in abstracts_sorted:
 		<em>${", ".join(map(rename, abstract.get('name_pis_string', [])))}</em>
 	</p>
 
-	${markdown.markdown(abstract.get('registration_abstract_text').replace('\t','').replace('\n','\n\n'), extensions=[]).replace('<p>','<p align="justify" style="text-align:justify;text-justify:inter-ideograph">').replace('</p>','</p>')}
+	${markdown.markdown(abstract.get('registration_abstract_text').replace('\t','').replace('\n','\n\n'), safe_mode='escape').replace('<p>','<p align="justify" style="text-align:justify;text-justify:inter-ideograph">').replace('</p>','</p>') | n}
 
 	<br clear="all" style="page-break-before:always" />
 % endfor

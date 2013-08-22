@@ -84,14 +84,14 @@
 
 		<h1 style="border-bottom:none;text-align:center">
 			<a href="${ctxt.root}/">
-			The Verna &amp; Marrs McLean Department<br /> of Biochemistry &amp; Molecular Biology<br /> and<br /> The Department of Pharmacology<br /> Research Conference 2012
+			The Verna &amp; Marrs McLean Department<br /> of Biochemistry &amp; Molecular Biology<br /> and<br /> The Department of Pharmacology<br /> Research Conference 2013
 			</a>
 		</h1>
 
 		<p style="text-align:center">
-			October 11 &amp; 12, 2012 <br />
-			<a href="http://maps.google.com/maps/place?cid=16125525481837692146&q=The+Tremont+House,+Galveston,+TX&hl=en&sll=29.306085,-94.793944&sspn=0.010422,0.008254&ie=UTF8&ll=29.312653,-94.803236&spn=0.000019,0.000021&t=h&z=16&vpsrc=0">
-				The Tremont House, Galveston TX
+			October 10 &amp; 11, 2013 <br />
+			<a href="http://www.sanluisresort.com/">
+				San Luis Resort, Galveston TX
 			</a>
 		</p>
 
@@ -102,5 +102,14 @@
 
 ## No tabs..
 <%block name="tabs" />
+
+## Ughgh..
+<ul class="e2-alert">
+% if ERRORS:
+    % for e in ERRORS:
+        <li>Error: ${e}</li>
+    % endfor
+% endif
+</ul>
 
 ${next.body()}
