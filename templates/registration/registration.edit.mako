@@ -83,7 +83,7 @@
     						All 3rd year and above students are required to present a talk or a poster.
     						2nd year students and postdocs are encouraged to present talks and posters.
     						You will have until September 23, 2013 to submit and revise abstracts.
-                            Maximum poster size is 3'10" wide by 4'8" high.
+                            Maximum poster size is 4 feet by 4 feet.
                         </p>
 					% else:
 						${pres.get(rec.get('registration_presentation'))}
