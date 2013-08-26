@@ -58,7 +58,9 @@ faculty = [
     "Zechiedrich, Lynn",
     "Zhang, Pumin",
     "Zhou, Ming",
-    "Zhou, Zheng"
+    "Zhou, Zheng",
+    "Zhang, Xiang",
+    "Schiff, Rachel"
 ]
 
 
