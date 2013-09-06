@@ -19,7 +19,6 @@ faculty = [
     "Fann, William Edwin",
     "Gilbert, Hiram F.",
     "Golding, Ido",
-    "He, Xiangwei",
     "Kim, Choel",
     "Kosten, Thomas",
     "Kuspa, Adam",
@@ -27,10 +26,8 @@ faculty = [
     "Ludtke, Steve",
     "Ma, Jianpeng",
     "Matzuk, Martin",
-    "Morrisett, Joel D.",
     "Newton, Thomas",
     "Palzkill, Timothy",
-    "Pan, Xuewen",
     "Peters, Christopher",
     "Pool, James L.",
     "Prasad, B.V.V.",
@@ -60,7 +57,10 @@ faculty = [
     "Zhou, Ming",
     "Zhou, Zheng",
     "Zhang, Xiang",
-    "Schiff, Rachel"
+    "Schiff, Rachel",
+    "Chen, Rui",
+    "Tweardy, David",
+    "Venken, Koen",
 ]
 
 

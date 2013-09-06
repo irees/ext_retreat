@@ -63,4 +63,4 @@ for user in users:
 
 %>
 
-${outfile.getvalue()}
+${outfile.getvalue() | n}
