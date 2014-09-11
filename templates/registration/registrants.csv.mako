@@ -2,8 +2,9 @@
 import csv
 import collections
 import cStringIO
-
 import jsonrpc.jsonutil
+import emen2.db.config
+
 users_d = {}
 for user in users:
 	users_d[user.name] = user
@@ -23,14 +24,16 @@ header = ['Last Name',
 	'Tshirt', 
 	'Vegetarian', 
 	'Employee Type',
-	'Attending Thursday',
-	'Attending Friday',
 	'Poster or talk',
 	'Hotel',
 	'Gender',
 	'Roommate',
-	'Charge Source'
+	'Date registered',
+	'Charge Source',
 ]
+header.extend(emen2.db.config.get('ext_retreat.dates'))
+
+
 writer.writerow(header)
 
 for user in users:
@@ -52,13 +55,15 @@ for user in users:
 	row.append(reg.get('registration_shirtsize'))
 	row.append(', '.join(reg.get('registration_mealpreferences',[])))
 	row.append(reg.get('registration_type'))
-	row.append('2013-10-10' in reg.get('registration_attend',[]))
-	row.append('2013-10-11' in reg.get('registration_attend',[]))
 	row.append(reg.get('registration_presentation'))
 	row.append(reg.get('registration_accomodation'))
 	row.append(reg.get('registration_gender'))
 	row.append(reg.get('registration_roommate'))
+	row.append(reg.get('creationtime'))
 	row.append(reg.get('registration_funding_source'))
+	dates = reg.get('registration_attend',[])
+	for date in emen2.db.config.get('ext_retreat.dates'):
+		row.append(date in dates)
 	writer.writerow(row)
 
 %>

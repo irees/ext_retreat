@@ -1,15 +1,16 @@
+<%! import emen2.db.config %>
 <%inherit file="/page" />
 
 <%namespace name="buttons" file="/buttons"  /> 
 <%namespace name="login" file="/auth/login"  /> 
 
-<p>Welcome to the Baylor College of Medicine Biochemistry &amp; Molecular Biology and Department of Pharmacology Research Conference 2013.</p>
+<p>Welcome to the Baylor College of Medicine Biochemistry &amp; Molecular Biology and Department of Pharmacology Research Conference.</p>
 
 <br />
 
 <form action="${ctxt.root}/registration/new/" method="get">
 	<p style="text-align:center">
-		<input type="submit" class="e2l-big" value="Click here to register for the 2013 conference" />
+		<input type="submit" class="e2l-big" value="Click here to register for the ${emen2.db.config.get('ext_retreat.year')} conference" />
 	</p>
 </form>
 

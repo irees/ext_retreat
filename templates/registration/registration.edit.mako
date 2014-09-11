@@ -1,4 +1,8 @@
-<%! import collections %>
+<%! 
+import datetime
+import collections
+import emen2.db.config
+%>
 <%inherit file="/page" />
 <%namespace name="buttons" file="/buttons"  /> 
 <%namespace name="forms" file="/forms"  />
@@ -55,8 +59,8 @@
 					    <ul class="e2l-nonlist">
 					        <% 
                                 days = collections.OrderedDict()
-                                days['2013-10-10'] = "Thursday, October 10"
-                                days['2013-10-11'] = "Friday, October 11"
+                                for k in emen2.db.config.get('ext_retreat.dates', []):
+                          			  days[k] = datetime.datetime.strptime(k, '%Y-%m-%d').strftime('%A, %B %d, %Y')                                
 					        %>
 					        ${forms.checkboxes(prefix+'registration_attend', days, elem='li', values=rec.get('registration_attend'))}
 					    </ul>
@@ -73,7 +77,7 @@
                         pres = collections.OrderedDict()
                         pres['Talk'] = "I would like to present a talk or a poster."
                         pres['Poster'] = "I would like to present a poster."
-                        pres[''] = "I prefer not to present."
+                        pres['decline'] = "I prefer not to present."
                     %>
 					% if edit:
 					    <ul class="e2l-nonlist">
@@ -82,7 +86,7 @@
                         <p>
     						All 3rd year and above students are required to present a talk or a poster.
     						2nd year students and postdocs are encouraged to present talks and posters.
-    						You will have until September 23, 2013 to submit and revise abstracts.
+    						You will have until ${emen2.db.config.get('ext_retreat.deadline_abstracts')} to submit and revise abstracts.
                             Maximum poster size is 4 feet by 4 feet.
                         </p>
 					% else:
@@ -98,13 +102,13 @@
 				<td>
 				    <% 
 				        accom = collections.OrderedDict()
-				        accom['decline'] = "I will not need a hotel room."
-				        accom['single'] =  "I am a faculty member and will have my own hotel a room."
-				        accom['shared'] = "I will be sharing a room, and..."
+				        accom['decline'] = "I will not need a hotel room"
+				        accom['single'] =  "I am a faculty member and prefer a single room"
+				        accom['shared'] = "I will be sharing a room"
 				    %>
 					% if edit:
                         <ul class="e2l-nonlist">
-                            ${forms.radios(prefix+'registration_accomodation', accom, required='required', elem='li', value=rec.get('registration_accomodation'))}
+                            ${forms.radios(prefix+'registration_accomodation', accom, required=True, elem='li', value=rec.get('registration_accomodation'))}
                         </ul>
 			
 						<ul style="padding-left:40px">
@@ -147,9 +151,9 @@
                 <tr>
                     <td>T-shirt:</td>
                     <td>
-                        <% shirtsizes = ["Men's Small", "Men's Medium", "Men's Large", "Men's XL", "Men's XXL", "Women's Small", "Women's Medium", "Women's Large", "Women's XL", "Women's XXL"] %>
+                        <% shirtsizes = ["Men's Small", "Men's Medium", "Men's Large", "Men's XL", "Men's XXL", "Women's Small", "Women's Medium", "Women's Large", "Women's XL", "Women's XXL", "decline"] %>
                         % if edit:
-                            ${forms.select(prefix+'registration_shirtsize', shirtsizes, value=rec.get('registration_shirtsize'))}
+                            ${forms.select(prefix+'registration_shirtsize', shirtsizes, value=rec.get('registration_shirtsize'), required=True)}
                             <br />Note: Women's sizes tend to run small.
                         % else:
                             ${rec.get('registration_shirtsize')}

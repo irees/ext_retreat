@@ -1,3 +1,8 @@
+<%!
+import datetime
+import emen2.db.config
+%>
+
 <%inherit file="/layout" />
 
 <%block name="css_inline">
@@ -84,15 +89,15 @@
 
 		<h1 style="border-bottom:none;text-align:center">
 			<a href="${ctxt.root}/">
-			The Verna &amp; Marrs McLean Department<br /> of Biochemistry &amp; Molecular Biology<br /> and<br /> The Department of Pharmacology<br /> Research Conference 2013
+			The Verna &amp; Marrs McLean Department<br /> of Biochemistry &amp; Molecular Biology<br /> and<br /> The Department of Pharmacology <br /> Research Conference - ${emen2.db.config.get('ext_retreat.year')}
 			</a>
 		</h1>
 
 		<p style="text-align:center">
-			October 10 &amp; 11, 2013 <br />
-			<a href="http://www.sanluisresort.com/">
-				San Luis Resort, Galveston TX
-			</a>
+			${" and ".join(map(lambda x:datetime.datetime.strptime(x, '%Y-%m-%d').strftime('%A, %B %d, %Y'), emen2.db.config.get('ext_retreat.dates', [])))} <br />
+			<a href="${emen2.db.config.get('ext_retreat.site_link')}">
+				${emen2.db.config.get('ext_retreat.site_name')}
+			</a> <br />
 		</p>
 
 	</div>

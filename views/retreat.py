@@ -6,63 +6,8 @@ import csv
 
 from emen2.web.view import View
 
-faculty = [
-    "Atassi, M. Zouhair",
-    "Barth, Patrick",
-    "Chan, Lawrence C. B.",
-    "Chan, Pui-Kwong",
-    "Chiu, Wah",
-    "Danesh, Farhad R.",
-    "De La Garza, Richard",
-    "Donoviel, Dorit B.",
-    "Entman, Mark L.",
-    "Fann, William Edwin",
-    "Gilbert, Hiram F.",
-    "Golding, Ido",
-    "Kim, Choel",
-    "Kosten, Thomas",
-    "Kuspa, Adam",
-    "Lichtarge, Olivier",
-    "Ludtke, Steve",
-    "Ma, Jianpeng",
-    "Matzuk, Martin",
-    "Newton, Thomas",
-    "Palzkill, Timothy",
-    "Peters, Christopher",
-    "Pool, James L.",
-    "Prasad, B.V.V.",
-    "Qin, Jun",
-    "Quiocho, Florante A.",
-    "Reddy, Ramachandra R.",
-    "Rosenberg, Susan M.",
-    "Sazer, Shelley",
-    "Schmid, Michael F.",
-    "Sokac, Anna Marie",
-    "Song, Yongcheng",
-    "Songyang, Zhou",
-    "Sreekumar, Arun",
-    "Taylor, Addison A.",
-    "Tolias, Kimberley R.",
-    "Tsai, Francis T. F.",
-    "Wakil, Salih J.",
-    "Wang, Jin",
-    "Wang, Jue",
-    "Wang, Qinghua",
-    "Wensel, Theodore G.",
-    "Westbrook, Thomas F.",
-    "Wilson, John",
-    "Yeoman, Lynn",
-    "Zechiedrich, Lynn",
-    "Zhang, Pumin",
-    "Zhou, Ming",
-    "Zhou, Zheng",
-    "Zhang, Xiang",
-    "Schiff, Rachel",
-    "Chen, Rui",
-    "Tweardy, David",
-    "Venken, Koen",
-]
-
+import emen2.db
+import emen2.db.config
 
 def nodeleted(r):
     return filter(lambda x:not x.get('deleted'), r)
@@ -75,7 +20,7 @@ class Registration(View):
         self.title = "Registration"
         self.template = "/registration/registration.main"
 
-        self.ctxt['faculty'] = sorted(faculty)
+        self.ctxt['faculty'] = sorted(emen2.db.config.get('ext_retreat.faculty'))
         self.ctxt['ERRORS'] = []
 
         # Anonymous users get the login page
@@ -108,7 +53,19 @@ class Registration(View):
         if not self.request_method == 'post':
             return
 
-        kwargs['childrecs'] = [kwargs.pop('childrec')]
+        childrec = kwargs.pop('childrec')        
+        kwargs['childrecs'] = [childrec]
+
+        try:
+          for k in ['name_first', 'name_last', 'institution', 'department', 'email', 'password']:
+            if not kwargs.get(k):
+              raise ValueError("Please make sure you entered your first name, last name, institution, department, email, and password.")
+          for k in ['registration_type', 'registration_attend', 'registration_pi', 'registration_presentation', 'registration_accomodation', 'registration_shirtsize']:
+            if not childrec.get(k):
+              raise ValueError("Please make sure you entered your attendee type, primary PI, presentation option, accomodation requests, and shirt choice.")
+        except Exception, e:
+          self.ctxt['ERRORS'].append(e)
+          return
 
         # Add the new user account.
         email = kwargs.get('email','')
@@ -125,7 +82,7 @@ class Registration(View):
         # Check for errors before continuing
         if self.ctxt['ERRORS']:
             return
-        
+            
         try:
             user = self.db.newuser.new(email=email, password=password)
             user.setsignupinfo(kwargs)

@@ -25,6 +25,7 @@ for reg in registrations:
             <th>Attending</th>
             <th>Presenting</th>
             <th>Accomodations</th>
+            <th>Registered</th>
             <th>Charge Source</th>
             <th>Etc.</th>
         </tr>
@@ -51,13 +52,14 @@ for reg in registrations:
                 ${reg.get('registration_pi')}<br />
                 ## ${reg.get('registration_pi_secondary')}                
             </td>
-            <td>${',<br />'.join(reg.get('registration_attend') or [])}</td>
+            <td>${', <br />'.join(reg.get('registration_attend') or []) | n}</td>
             <td>${reg.get('registration_presentation')}</td>
             <td>
                 ${reg.get('registration_accomodation')}<br />
                 ${reg.get('registration_gender','')}<br />
                 ${reg.get('registration_roommate','')}
             </td>
+            <td>${reg.get('creationtime')[:10]}</td>
             <td>${reg.get('registration_funding_source')}</td>
             <td>
                 <a href="${ctxt.root}/registration/abstract/new/?user=${user.name}">New Abstract</a>
@@ -69,7 +71,7 @@ for reg in registrations:
 
 <h1>
     Abstracts
-    <a href="${ctxt.root}/registration/admin/abtracts/">Preview</a>
+    <a href="${ctxt.root}/registration/admin/abstracts/">Preview</a>
 </h1>
 
 <table class="e2l-shaded" cellspacing="0" cellpadding="0">
