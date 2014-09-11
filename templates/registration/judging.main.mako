@@ -5,15 +5,18 @@ import random
 
 <%
 COUNT = 5
+
 registration_d = {}
 for registration in registrations:
     registration_d[registration.name] = registration
 
 abstract_d = {}  
+abstract_number = {}
 for abstract in abstracts:
     abstract_d[abstract.name] = abstract
+    abstract_number[abstract.name] = abstract.get('registration_poster_number')
     
-abstract_names = set([abstract.name for abstract in abstracts])    
+abstract_names = set([abstract.name for abstract in abstracts])
 POSTER_NUMS = {}
 
 user_d = {}
@@ -32,7 +35,6 @@ def mtx(keys):
 
 def samplemin(d, count=1, reverse=False):
     ret = []
-
     values = collections.defaultdict(list)
     for k,v in d.items():
         values[v].append(k)
@@ -41,7 +43,6 @@ def samplemin(d, count=1, reverse=False):
         ret.extend(v)
         if len(ret) >= count:
             return ret
-
     return ret
     
 def namefilt(names):
@@ -64,18 +65,24 @@ def initials(name):
     ret = "%s %s"%(initial, lastname)
     return ret.strip()
 
+
+###############
+##### Go! #####
+###############
+
 user_conflicts = {}
+user_even = {}
+user_numbers = {}
 abstract_conflicts = {}
 
 for user in users:
-    user_d[user.name] = user
-    if not user.userrec:
-        continue
-
     # Find posters that I can judge
     # 1. This means that I can't have the same PI,
     # 2. or have my name on their author list,
     # 3. person cant have the same name as anyone on my poster list.
+    user_d[user.name] = user
+    if not user.userrec:
+        continue
 
     # Check that I registered
     my_registration = user.userrec.children & set(registration_d.keys())
@@ -103,15 +110,29 @@ for user in users:
     for abstract in my_abstracts:
         conflicts |= set(abstract.get('name_pis_string', []))
         conflicts |= set(abstract.get('registration_abstract_authors', []))
-    
+
+    # This part is tricky. If the user has an EVEN NUMBERED POSTER, they can only 
+    # do detailed evaluation on an ODD NUMBERED POSTER. Also, the converse.
+    # If user has NO POSTERS, they can judge both even and odd.
+    # If user has MULTIPLE POSTERS, with EVEN AND ODD, then they can judge both. 
+    #   -- I don't have a better way to handle that.
+    numbers = [abstract_number[abstract.name] for abstract in my_abstracts]
+    user_numbers[user.name] = numbers
+    numbers_even = map(lambda x:x%2 == 0, filter(None, numbers))
+    if numbers_even and all(numbers_even):
+        user_even[user.name] = True
+    elif True in numbers_even:
+        user_even[user.name] = None
+    elif False in numbers_even:
+        user_even[user.name] = False
+    else:
+        user_even[user.name] = None
+
     user_conflicts[user.name] = namefilt(conflicts)
     print "Conflicts for user:", user.displayname
     print user_conflicts[user.name]
 
-# Skip talks
-# abstracts = filter(lambda x:x.get('registration_presentation') != 'talk', all_abstracts)
-
-# Ok, now look at each poster.
+# Ok, now look at each poster. Find every possible conflict.
 for abstract in abstracts:
     conflicts = set()
     conflicts.add(abstract.get('registration_presenter'))
@@ -125,6 +146,7 @@ for abstract in abstracts:
 
 # Check for conflicts
 matches = collections.defaultdict(set)
+user_excluded = collections.defaultdict(set)
 for k, v in user_conflicts.items():
     u = user_d[k]
     for k2,v2 in abstract_conflicts.items():
@@ -138,7 +160,7 @@ for k, v in user_conflicts.items():
             matches[k].add(k2)
         else:
             # print "\tConflicts! not adding poster:", v & v2
-            pass
+            user_excluded[k].add(k2)
 
 # compared = collections.defaultdict(set)
 compared = {}
@@ -153,15 +175,9 @@ for i in abstracts:
         compared[(i.name,j.name)] = set()
         compared[(j.name,i.name)] = set()
 
-judged = {}
-
-# pairs = mtx([i.name for i in abstracts*10])
-pairs = compared.keys()
 
 import copy
-p = copy.copy(pairs)
-random.shuffle(p)
-p = collections.deque(pairs)
+judged = {}
 
 for r in range(COUNT):
     print "\nRound: ", r
@@ -169,8 +185,8 @@ for r in range(COUNT):
     random.shuffle(u)
     for user, posters in u:
         print "\nUser:", user
-        j = judged.get(user, [])
 
+        j = judged.get(user, [])
         if not j:
             # Seed with the first poster
             p = {}
@@ -186,8 +202,6 @@ for r in range(COUNT):
             # new poster that avoids any already sampled
             # comparisons
             p = {}
-            # posters = list(posters)
-            # random.shuffle(posters)
             for poster in posters:
                 if poster in j:
                     continue
@@ -205,6 +219,29 @@ for r in range(COUNT):
                 judged_by[i].add(user)
                 judged_by[j].add(user)
 
+
+# Detailed posters
+user_detailed = {}
+for username, posters in judged.items():
+    matched_numbers = set([abstract_number[i] for i in matches.get(username, [])])
+    poster_numbers = set([abstract_number[i] for i in posters])
+    
+    # Filter by poster session EVEN / ODD
+    if user_even[username] == True:
+        poster_numbers = filter(lambda x:x%2 == 1, poster_numbers)
+        matched_numbers = filter(lambda x:x%2 == 1, matched_numbers)
+    if user_even[username] == False:
+        poster_numbers = filter(lambda x:x%2 == 0, poster_numbers)
+        matched_numbers = filter(lambda x:x%2 == 0, matched_numbers)
+
+    if len(poster_numbers) == 0:
+        detail = random.sample(matched_numbers, 2)
+    elif len(poster_numbers) == 1:
+        detail = random.sample(poster_numbers, 1) + random.sample(matched_numbers, 1)
+    elif len(poster_numbers) > 1:
+        detail = random.sample(poster_numbers, 2)
+    user_detailed[username] = detail
+
 %>
 
 <html>
@@ -218,15 +255,14 @@ for r in range(COUNT):
             }
             h1 {
                 border-bottom: solid 1px;
-                font-size: 24pt;
+                font-size: 22pt;
             }
             .retreat-posters {
                 border: dashed 2px black;
-                width: 65%;
+                width: 80%;
                 margin-left: auto;
                 margin-right: auto;
                 padding: 15px;
-                font-size: 18pt;
                 text-align: center;
             }
             .retreat-posters span {
@@ -239,18 +275,16 @@ for r in range(COUNT):
             }
             .retreat-rank {
                 width: 40px;
-                font-size: 18pt;
             }
             .retreat-result {
                 border-bottom:solid 2px black;
                 padding: 20px;
             }
             .retreat-scores {
-                font-size: 18pt;
                 padding: 20px;
                 width: 400px;
             }
-            
+
             table.retreat-stats thead th,
             table.retreat-stats thead td {
                 border-bottom:solid 1px #ccc;
@@ -258,7 +292,7 @@ for r in range(COUNT):
             table.retreat-stats tbody tr:nth-child(even) { background-color:#eee; }
 
             .retreat-stats td {
-                padding:5px;
+                padding:10px;
             }
             
             #retreat-comparisons {
@@ -279,7 +313,7 @@ for r in range(COUNT):
             }
             
             .retreat-form {
-                font-size:18pt;
+                font-size:14pt;
                 page-break-before:always
             }
             
@@ -292,8 +326,6 @@ for r in range(COUNT):
 <body>
 
 <h1>Statistics</h1>
-
-(Note: poster record IDs, not poster #s)<br />
 
 <%
 count = 0
@@ -308,6 +340,19 @@ for k,v in compared.items():
         comp_count[k] = len(v)
 
 cells = sum(range(len(abstract_d)))
+
+
+detailed_eval = {}
+for k,v in abstract_number.items():
+    detailed_eval[v] = set()
+for k,v in user_detailed.items():
+    for v2 in v:
+        detailed_eval[v2].add(k)
+
+detailed_eval_count = collections.defaultdict(int)
+for k,v in detailed_eval.items():
+    detailed_eval_count[len(v)] += 1
+
 %>
 
 <h3>Overview</h3>
@@ -356,6 +401,18 @@ cells = sum(range(len(abstract_d)))
             <td>${_jpp.count(v)}</td>
         </tr>
     % endfor
+    
+    
+    <tr>
+        <td><strong>Detailed evaluations per poster:</strong>
+        <td>${min(detailed_eval_count.keys())} - ${max(detailed_eval_count.keys())}</td>
+    </tr>
+    % for k,v in sorted(detailed_eval_count.items()):
+        <tr>
+            <td><strong>${k}</strong></td>
+            <td>${v}</td>
+        </tr>
+    % endfor
 
     
 </table>
@@ -367,15 +424,15 @@ cells = sum(range(len(abstract_d)))
         <tr>
             <td></td>
             % for key in sorted(abstract_d):
-                <td><strong>${key}</strong></td>
+                <td style="width:15px"><strong>${abstract_number[key]}</strong></td>
             % endfor
         </tr>
     </thead>
     
     <tbody>
-        % for key in sorted(abstract_d, reverse=True):
+        % for key in sorted(abstract_d):
             <tr>
-                <td><strong>${key}</strong></td>
+                <td><strong>${abstract_number[key]}</strong></td>
                 % for key2 in sorted(abstract_d):
                     % if key == key2:
                         <td style="background:#ccc"> </td>
@@ -394,23 +451,20 @@ cells = sum(range(len(abstract_d)))
 <table class="retreat-stats" cellpadding="0" cellspacing="0">
     <thead>
         <tr>
-            ## <th>ID</td>
             <th>Name</td>
-            <th>Total</th>
-            <th>Poster ID (Poster #)</th>
+            <th>Own posters</th>
+            <th>Excluded</th>
+            <th>Judged</th>
+            <th>Detailed</th>
         </tr>
     </thead>
     % for user, posters in judged.items():
         <tr>
-            ## <td>${user_d[user].name}</td>
-            <td>${user_d[user].displayname}</td>
-            <td>${len(posters)}</td>
-            <td>
-                % for poster in posters:
-                    ${poster}
-                    (${abstract_d[poster].get('registration_poster_number')}) <br />
-                % endfor
-            </td>
+            <td>${user_d[user].displayname} </td>
+            <td>${", ".join(map(str, user_numbers[user]))} </td>
+            <td>${", ".join(map(str, [abstract_number[i] for i in user_excluded[user]]))} </td>
+            <td>${", ".join(map(str, [abstract_number[i] for i in posters]))} </td>
+            <td>${", ".join(map(str, [i for i in user_detailed[user]]))} </td>
         </tr>
     % endfor
 </table>
@@ -430,7 +484,7 @@ cells = sum(range(len(abstract_d)))
     % for poster, u in sorted(judged_by.items(), key=lambda x:len(x[1]), reverse=True):
         <tr>
             ## <td>${abstract_d[poster].name}</td>
-            <td>${abstract_d[poster].get('registration_poster_number')}</td>
+            <td>${abstract_number[poster]}</td>
             <td>${abstract_d[poster].get('registration_abstract_title')}</td>
             <td>${len(u)}</td>
             <td style="width:400px">
@@ -442,7 +496,12 @@ cells = sum(range(len(abstract_d)))
             </td>
     % endfor
 </table>
-    
+
+<h1>Detailed evaluations</h1>
+
+
+
+
     
 <h1>Judging forms</h1>
 
@@ -461,7 +520,7 @@ cells = sum(range(len(abstract_d)))
         % for poster in sorted(posters):
             <span>
                 &nbsp;&nbsp;
-                ${abstract_d[poster].get('registration_poster_number')}
+                ${abstract_number[poster]}
                 &nbsp;&nbsp;
             </span>
         % endfor
@@ -530,8 +589,50 @@ cells = sum(range(len(abstract_d)))
     </p>
 
     </div>
+% endfor   
 
-% endfor    
+
+<h1>Detailed Judging forms</h1>
+
+% for username, posters in sorted(user_detailed.items()):
+    <%
+    user = user_d.get(username)
+    
+    cats = [
+    "Titles, Authors, Affiliations",
+    "Abstract for the Program Book",
+    "Description and Background",
+    "Big Question or Gap",
+    "Hypothesis / Model",
+    "Methods and Results",
+    "Interpretations and Model",
+    "Visual presentation",
+    "Oral presentation"
+    ]
+    
+    
+    %>
+    % for poster in posters:
+        <div class="retreat-form"> 
+        <h1>${user.displayname.title()}</h1>
+        <h3>Detailed evaluation for Poster ${poster}</h3>
+        
+        <table width="100%">
+            % for cat in cats:
+            <tr>
+                <td width="60%">
+                    <strong>${cat}</strong>
+                    <br />Comments &amp; suggestions:<br /><br /><br />
+                </td>
+                <td valign="top"><strong>0 &nbsp;&nbsp;&nbsp; 1 &nbsp;&nbsp;&nbsp; 2 &nbsp;&nbsp;&nbsp; 3<strong></td>
+            </tr>
+            % endfor
+        </table>
+
+
+        </div>
+    % endfor
+% endfor
     
     
 </body>
