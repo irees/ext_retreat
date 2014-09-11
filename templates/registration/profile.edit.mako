@@ -56,9 +56,7 @@
                         'Other'
                     ]
                     %>
-                    ${forms.select('department', depts, value=person.get('department'))}
-                    ## &mdash; or &mdash;                     
-                    ## ${forms.text('department', value=person.get('department'))}
+                    ${forms.select('department', depts, value=person.get('department'), required=True)}
                 </td>
 			</tr>
 
